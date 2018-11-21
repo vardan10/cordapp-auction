@@ -1,0 +1,264 @@
+<!--
+--------
+WARNING:
+--------
+
+THIS CODE IS ONLY MADE AVAILABLE FOR DEMONSTRATION PURPOSES AND IS NOT SECURE! DO NOT USE IN PRODUCTION!
+
+FOR SECURITY REASONS, USING A JAVASCRIPT WEB APP HOSTED VIA THE CORDA NODE IS NOT THE RECOMMENDED WAY TO INTERFACE
+WITH CORDA NODES! HOWEVER, FOR THIS PRE-ALPHA RELEASE IT'S A USEFUL WAY TO EXPERIMENT WITH THE PLATFORM AS IT ALLOWS
+YOU TO QUICKLY BUILD A UI FOR DEMONSTRATION PURPOSES.
+
+GOING FORWARD WE RECOMMEND IMPLEMENTING A STANDALONE WEB SERVER THAT AUTHORISES VIA THE NODE'S RPC INTERFACE. IN THE
+COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Auction - CorDapp</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/style.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/bootstrap-theme.min.css" crossorigin="anonymous">
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="assets/js/angular.min.js"></script>
+    <script src="assets/js/ui-bootstrap-tpls.min.js"></script>
+    <script src="assets/js/ng-loading-overlay.min.js"></script>
+    <script src="js/angular-module.js"></script>
+</head>
+
+<body ng-app="auctionAppModule" ng-controller="AuctionAppController as demoApp">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="site-header">Auction - CorDapp</div>
+        </div>
+    </nav>
+
+    <!-- Auction Listing Start -->
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">{{demoApp.thisNode}}</a>
+                </div>
+                <button ng-click="demoApp.openModal()" type="button" class="btn btn-primary navbar-btn pull-right">Create Auction</button>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+    <!-- Auction Listing Ends -->
+
+
+    <!-- Auction Listing Start -->
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="panel-group" id="accordion">
+                <div class="panel">
+                    <div class="panel-primary">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">Auctions:</h4>
+                        </div>
+                    </div>
+                    <div>
+                        <div ng-show="!demoApp.auctions.length" class="panel-body">Use the "Create Auction" button to create an auction.</div>
+                        <div ng-repeat="auction in demoApp.auctions" class="panel panel-default">
+                            <div class="bs-callout bs-callout-danger pull-right">
+                                <h4 ng-class="(auction.auctionActive==true) ? 'auction-live' : 'auction-closed'">
+                                    <span ng-if="auction.auctionActive==true">
+                                        Auction Live
+                                    </span>
+                                    <span ng-if="auction.auctionActive==false">
+                                        Auction Closed
+                                    </span>
+                                </h4>
+                            </div>
+                            <div class="panel-body panel-border">
+                                <div class="auctionId">
+                                    <h4>Auction ID - {{auction.linearId.id}}</h4>
+                                </div>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-xs-7">
+                                            <table class="table table-bordered">
+                                                <tr>
+                                                    <th>Item Name</th>
+                                                    <td>{{auction.itemName}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Item Description</th>
+                                                    <td>{{auction.itemDescription}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Expiry Date</th>
+                                                    <td>{{auction.expiryDate}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Auction Start Price</th>
+                                                    <td>{{auction.startPrice}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Highest bid</th>
+                                                    <td>
+                                                        <span ng-if="auction.highestBid==0">
+                                                            -
+                                                        </span>
+                                                        <span ng-if="auction.highestBid!=0">
+                                                            {{auction.highestBid}}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Highest Bid (participant)</th>
+                                                    <td>
+                                                        <span ng-if="auction.auctionWinner==null">
+                                                            -
+                                                        </span>
+                                                        <span ng-if="auction.auctionWinner!=null">
+                                                            {{auction.auctionWinner}}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-xs-5">
+                                            <button ng-if="(auction.auctionActive==true)" ng-click="demoApp.openBidModal(auction.linearId.id)" type="button" class="btn btn-primary">Bid</button>
+                                            <button ng-click="demoApp.openTransactionDetailsModal(auction.linearId.id)" type="button" class="btn btn-primary">Transaction Details</button>
+                                            <button ng-if="(auction.itemOwner==demoApp.thisNode)" ng-click="demoApp.closeAuction(auction.linearId.id)" type="button" class="btn btn-primary">Close Auction</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+    <!-- Auction Listing Ends -->
+
+
+    <!-- Create Auction Content Start -->
+    <script type="text/ng-template" id="createAuctionModal.html">
+        <div class="modal-header">
+            <h4 class="modal-title">Create Auction</h4>
+        </div>
+        <form>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="auctionType" class="control-label">Auction Type:</label><br>
+                    <input ng-model="modalInstance.form.auctionType" type="radio" name="gender" value="Open"> Open to All
+                    <input ng-model="modalInstance.form.auctionType" type="radio" name="gender" value="Private"> Private
+                </div>
+                <div class="form-group">
+                    <label for="auctionParticipants" class="control-label">Auction Participants (Only if auction is Private):</label>
+                    <select multiple ng-model="modalInstance.form.auctionParticipants" class="form-control" id="auctionParticipants" ng-options="peer as peer for peer in modalInstance.peers">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="itemName" class="control-label">Item Name:</label>
+                    <input type="text" ng-model="modalInstance.form.itemName" class="form-control" id="itemName">
+                </div>
+                <div class="form-group">
+                    <label for="itemDescription" class="control-label">Item Description:</label>
+                    <input type="text" ng-model="modalInstance.form.itemDescription" class="form-control" id="itemDescription">
+                </div>
+                <div class="form-group">
+                    <label for="startPrice" class="control-label">Auction Start Price (Int):</label>
+                    <input type="text" ng-model="modalInstance.form.startPrice" class="form-control" id="startPrice">
+                </div>
+                <div class="form-group">
+                    <label for="expiryDate" class="control-label">Expiry Date (Instant):</label>
+                    <input type="text" ng-model="modalInstance.form.expiryDate" class="form-control" id="expiryDate">
+                </div>
+                <div ng-show="modalInstance.formError" class="form-group">
+                    <div class="alert alert-danger" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span class="sr-only">Error:</span> Enter valid Auction parameters
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
+                <button ng-click="modalInstance.create()" type="button" class="btn btn-primary">Create Auction</button>
+            </div>
+        </form>
+    </script>
+    <!-- Create Auction Content End -->
+
+
+    <!-- Bid Content Start -->
+    <script type="text/ng-template" id="BidModal.html">
+        <div class="modal-header">
+            <h4 class="modal-title">Bid Model</h4>
+        </div>
+        <form>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="amount" class="control-label">Amount (Int):</label>
+                    <input type="text" ng-model="modalInstance.form.amount" class="form-control" id="amount">
+                </div>
+                <div ng-show="modalInstance.formError" class="form-group">
+                    <div class="alert alert-danger" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span class="sr-only">Error:</span> Enter valid Bid parameters
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
+                <button ng-click="modalInstance.create()" type="button" class="btn btn-primary">make Bid</button>
+            </div>
+        </form>
+    </script>
+    <!-- Bid Content End -->
+
+    <!-- Bid Content Start -->
+    <script type="text/ng-template" id="closeAuctionModal.html">
+        <div class="modal-header">
+            <h4 class="modal-title">Are you sure?</h4>
+        </div>
+        <form>
+            <div class="modal-footer">
+                <button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">No</button>
+                <button ng-click="modalInstance.create()" type="button" class="btn btn-primary">Yes</button>
+            </div>
+        </form>
+    </script>
+    <!-- Bid Content End -->
+
+    <!-- Transaction Details Content Start -->
+    <script type="text/ng-template" id="TransactionDetailsModal.html">
+        <div class="modal-header">
+            <h4 class="modal-title">Transaction Details</h4>
+        </div>
+        <form>
+            <div class="modal-body">
+                <div class="transactionDetail">
+                    <pre>{{modalInstance.transactionDetails  | json }}</pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button ng-click="modalInstance.cancel()" type="button" class="btn btn-default">Close</button>
+            </div>
+        </form>
+    </script>
+    <!-- Transaction Details Content Start -->
+
+    <!-- Message Content Start -->
+    <script type="text/ng-template" id="messageContent.html">
+        <div class="modal-body" id="modal-body">
+            {{ modalInstanceTwo.message }}
+        </div>
+    </script>
+    <!-- Message Content End -->
+
+
+
+</body>
+
+</html>
