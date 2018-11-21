@@ -221,7 +221,6 @@ app.controller('CloseAuctionCtrl', function ($http, $location, $uibModalInstance
     modalInstance.form = {};
     modalInstance.formError = false;
 
-    // Validate and create Bid.
     modalInstance.create = () => {
         $loadingOverlay.show('Transaction Processing ...', 'rgba(0, 0, 0, 0.3)', '#fff');
         if (invalidFormInput()) {
@@ -232,7 +231,7 @@ app.controller('CloseAuctionCtrl', function ($http, $location, $uibModalInstance
 
             const endAuctionEndpoint = `${apiBaseURL}end-auction?AuctionReference=${demoApp.auctionId}`;
 
-            // Create Bid and handle success / fail responses.
+            // End Auction and handle success / fail responses.
             $http.put(endAuctionEndpoint).then(
                 (result) => {
                     $loadingOverlay.hide();

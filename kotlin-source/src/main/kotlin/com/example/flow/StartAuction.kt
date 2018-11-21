@@ -19,12 +19,12 @@ import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
 
 /**
- * A flow that handles the starting of a new campaigns. It creates a new [Campaign] and stores it in in the vault of the
- * node that runs this flow (the manager of the campaign) and then broadcasts it to all the other nodes on the
+ * A flow that handles the starting of a new auctions. It creates a new [auction] and stores it in in the vault of the
+ * node that runs this flow (the manager of the auction) and then broadcasts it to all the other nodes on the
  * crowdFunding business network.
  *
  * The nodes receiving the broadcast use the observable states feature by recording all visible output states despite
- * the fact the only participant for the [Campaign] start is the [manager] of the [Campaign].
+ * the fact the only participant for the [auction] start is the [manager] of the [auction].
  */
 @StartableByRPC
 class StartAuction( val itemName: String,

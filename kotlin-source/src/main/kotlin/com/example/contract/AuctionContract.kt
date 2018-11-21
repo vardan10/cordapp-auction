@@ -20,10 +20,10 @@ class AuctionContract : Contract {
     class AcceptBid : TypeOnlyCommandData(), Commands
 
     override fun verify(tx: LedgerTransaction) {
-        val campaignCommand = tx.commands.requireSingleCommand<Commands>()
-        val setOfSigners = campaignCommand.signers.toSet()
+        val auctionCommand = tx.commands.requireSingleCommand<Commands>()
+        val setOfSigners = auctionCommand.signers.toSet()
 
-        when (campaignCommand.value) {
+        when (auctionCommand.value) {
             is Start -> verifyStart(tx, setOfSigners)
             is End -> verifyEnd(tx, setOfSigners)
             is AcceptBid -> verifyBid(tx, setOfSigners)
@@ -44,7 +44,7 @@ class AuctionContract : Contract {
         "There must be a auction item name." using (auction.itemName != "")
 
         // Assert correct signers.
-        "The campaign must be signed by the manager only." using (signers.contains(auction.itemOwner.owningKey))
+        "The auction must be signed by the manager only." using (signers.contains(auction.itemOwner.owningKey))
     }
 
     private fun verifyBid(tx: LedgerTransaction, signers: Set<PublicKey>) = requireThat {
@@ -56,14 +56,14 @@ class AuctionContract : Contract {
         val auctionOutput = tx.outputsOfType<Auction>().single()
         val bidOutput = tx.outputsOfType<Bid>().single()
 
-        // Assert stuff about the pledge in relation to the campaign state.
+        // Assert stuff about the bid in relation to the auction state.
         "The bid must be for this acution." using (bidOutput.auctionReference == auctionOutput.linearId)
         "The auction must be updated by the amount bided." using (bidOutput.amount == auctionOutput.highestBid)
         "The bid must be higher than start price" using (bidOutput.amount > auctionOutput.startPrice)
         "The bid must be higher than highest bid" using (bidOutput.amount > auctionInput.highestBid)
 
         // Assert correct signer.
-        "The campaign must be signed by the manager only." using (signers.contains(auctionInput.itemOwner.owningKey))
+        "The auction must be signed by the manager only." using (signers.contains(auctionInput.itemOwner.owningKey))
     }
 
     private fun verifyEnd(tx: LedgerTransaction, signers: Set<PublicKey>) = requireThat {
@@ -74,8 +74,8 @@ class AuctionContract : Contract {
         // Get references to auction state.
         val auction = tx.inputsOfType<Auction>().single()
 
-        // Check the campaign state is signed by the campaign manager.
-        "Ending campaign transactions must be signed by the campaign manager." using (signers.contains(auction.itemOwner.owningKey))
+        // Check the auction state is signed by the auction manager.
+        "Ending auction transactions must be signed by the auction manager." using (signers.contains(auction.itemOwner.owningKey))
     }
 
 }

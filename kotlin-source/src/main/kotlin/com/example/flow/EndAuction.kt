@@ -17,10 +17,7 @@ import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
 
 /**
- * This pair of flows deals with ending the campaign, whether it successfully reaches its target or not. If the
- * campaign reaches the target then the manager sends a [CampaignResult.Success] object to all the pledgers, asking them
- * to provide cash states equal to the pledge they previously made. They send back the cash states to the manager who
- * assembles the transaction which exits the campaign and pledge states, and transfers the cash to the campaign manager.
+ * This flow deals with ending the auction
  */
 @StartableByRPC
 class EndAuction(val AuctionReference: String) : FlowLogic<SignedTransaction>() {

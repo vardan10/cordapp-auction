@@ -17,7 +17,7 @@ class BidContract : Contract {
     class Create : TypeOnlyCommandData(), Commands
 
     override fun verify(tx: LedgerTransaction) {
-        // We only need the pledge commands at this point to determine which part of the contract code to run.
+        // We only need the bid commands at this point to determine which part of the contract code to run.
         val bidCommand = tx.commands.requireSingleCommand<Commands>()
         val setOfSigners = bidCommand.signers.toSet()
 
@@ -36,14 +36,14 @@ class BidContract : Contract {
         val auctionOutput = tx.outputsOfType<Auction>().single()
         val bidOutput = tx.outputsOfType<Bid>().single()
 
-        // Assert stuff about the pledge in relation to the campaign state.
+        // Assert stuff about the bid in relation to the auction state.
         "The bid must be for this auction." using (bidOutput.auctionReference == auctionOutput.linearId)
         "The auction must be updated by the amount bid." using (bidOutput.amount == auctionOutput.highestBid)
         "The bid must be higher than start price" using (bidOutput.amount > auctionOutput.startPrice)
         "The bid must be higher than highest bid" using (bidOutput.amount > auctionInput.highestBid)
 
         // Assert correct signer.
-        "The campaign must be signed by the manager and bidder." using (signers.containsAll(listOf(auctionInput.itemOwner.owningKey,bidOutput.bidder.owningKey)))
+        "The auction must be signed by the manager and bidder." using (signers.containsAll(listOf(auctionInput.itemOwner.owningKey,bidOutput.bidder.owningKey)))
     }
 
 }

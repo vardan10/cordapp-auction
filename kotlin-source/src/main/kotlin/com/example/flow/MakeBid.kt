@@ -111,7 +111,7 @@ object MakeBid {
             val stx = subFlow(CollectSignaturesFlow(ptx, setOf(session), listOf(ourIdentity.owningKey)))
             val ftx = subFlow(FinalityFlow(stx))
 
-            // Let the campaign manager know whether we want to broadcast this update to observers, or not.
+            // Send list of auction paricipants to broadcast transaction
             session.sendAndReceive<Unit>(auctionState.AuctionParticipants)
 
             return ftx
@@ -137,8 +137,7 @@ object MakeBid {
 
             val stx = subFlow(flow)
 
-            // Once the transaction has been committed then we then broadcast from the manager so we don't compromise
-            // the confidentiality of the pledging identities, if they choose to be anonymous.
+            // Once the transaction has been committed then we then broadcast from the manager.
             val AuctionParticipants = otherSession.receive<List<Party>>().unwrap { it }
             val ftx = waitForLedgerCommit(stx.id)
             subFlow(BroadcastTransaction(ftx, AuctionParticipants))

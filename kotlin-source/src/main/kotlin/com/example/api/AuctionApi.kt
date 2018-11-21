@@ -72,7 +72,7 @@ class AuctionApi(private val rpcOps: CordaRPCOps) {
     @Path("get-auction")
     @Produces(MediaType.APPLICATION_JSON)
     fun getAuction(@QueryParam("linearID") linearID: String): Response {
-        if (linearID == null) {
+        if (linearID == "") {
             return Response.status(BAD_REQUEST).entity("Query parameter 'linearID' missing or has wrong format.\n").build()
         }
         val idParts = linearID.split('_')
@@ -112,7 +112,7 @@ class AuctionApi(private val rpcOps: CordaRPCOps) {
     @PUT
     @Path("make-bid")
     fun makeBid(@QueryParam("amount") amount: Int,@QueryParam("AuctionReference") AuctionReference: String): Response {
-        if (AuctionReference == null ) {
+        if (AuctionReference == "" ) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'Auction Reference' must not be null.\n").build()
         }
 
