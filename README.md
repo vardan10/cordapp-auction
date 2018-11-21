@@ -71,4 +71,3 @@ curl -X PUT 'http://localhost:10009/api/auction/end-auction?AuctionReference=<LI
 # ToDo's
 1. Auto-Close Auction when time expires
 2. Unit Tests
-3. Clean Up
