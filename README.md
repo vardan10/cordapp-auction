@@ -1,5 +1,5 @@
 # Auction CorDapp
-This CorDapp is an example of how Auctions can be performed in a decentralized manner. Auction can be Open to all or Private (accessible only to few).
+This CorDapp is an example of how Auctions can be performed in a decentralized manner. Auction can be Open to all or Private (accessible only to selected few parties).
 
 More about this usecase [here](https://medium.com/auctionity/making-auctions-safer-faster-and-more-reliable-through-blockchain-technology-part-1-2-5b01bf641b48)
 
