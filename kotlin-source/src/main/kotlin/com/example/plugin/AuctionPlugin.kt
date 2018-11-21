@@ -9,13 +9,13 @@ class AuctionPlugin : WebServerPluginRegistry {
    /**
     * A list of classes that expose web APIs.
     */
-   override val webApis: List<Function<CordaRPCOps, out Any>> = listOf(Function(::AuctionApi))
+   override val webApis = listOf(Function(::AuctionApi))
 
    /**
     * A list of directories in the resources directory that will be served by Jetty under /web.
     */
-   override val staticServeDirs: Map<String, String> = mapOf(
-           // This will serve the auctionWeb directory in resources to /web/auction
-           "auction" to javaClass.classLoader.getResource("auctionWeb").toExternalForm()
+   override val staticServeDirs = mapOf(
+           // This will serve the exampleWeb directory in resources to /web/example
+           "example" to javaClass.classLoader.getResource("exampleWeb").toExternalForm()
    )
 }
