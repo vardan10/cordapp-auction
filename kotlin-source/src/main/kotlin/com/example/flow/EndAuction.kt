@@ -19,6 +19,7 @@ import net.corda.core.utilities.ProgressTracker.Step
 /**
  * This flow deals with ending the auction
  */
+@SchedulableFlow
 @StartableByRPC
 class EndAuction(val AuctionReference: String) : FlowLogic<SignedTransaction>() {
 
