@@ -172,8 +172,8 @@ COMING WEEKS WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
                     <input type="text" ng-model="modalInstance.form.startPrice" class="form-control" id="startPrice">
                 </div>
                 <div class="form-group">
-                    <label for="expiryDate" class="control-label">Expiry Date (Instant):</label>
-                    <input type="text" ng-model="modalInstance.form.expiryDate" class="form-control" id="expiryDate">
+                    <label for="expiryDate" class="control-label">Expiry Date (Instant) (In Zulu format):</label>
+                    <input type="text" ng-model="modalInstance.form.expiryDate" class="form-control" id="expiryDate" placeholder="2018-11-22T05:23:00Z">
                 </div>
                 <div ng-show="modalInstance.formError" class="form-group">
                     <div class="alert alert-danger" role="alert">
